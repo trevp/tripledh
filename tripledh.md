@@ -73,10 +73,16 @@ Diffie-Hellman or Elliptic Curve Diffie-Hellman values.
 All keypairs must use the same (EC)DH parameters, so that the `DH()`
 function is defined between all public keys.
 
-In some TripleDH variants we assume Bob has additional data
-(signature, extra ephemeral public key).  These add security in cases
-where Bob is offline and Alice is performing an asynchronous key
-agreement, as explained below.
+In some TripleDH variants the Alice and Bob roles are symmetric, and
+the parties assign themselves roles based on any signal available
+(e.g. the initiator of the protocol may be Alice; or they may assign
+roles by comparing public keys).  In the "signed ephemeral" variants
+Bob is assumed to be offline, with Alice sending the first encrypted
+message.
+
+After exchanging public keys the parties calculate shared session keys
+which can be used to exchange mutually authenticated messages with
+forward secrecy, as shown below.
 
 2.4. Minimal TripleDH
 -
