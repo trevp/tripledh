@@ -80,9 +80,9 @@ roles by comparing public keys).  In the "signed ephemeral" variants
 Bob is assumed to be offline, with Alice sending the first encrypted
 message.
 
-After exchanging public keys the parties calculate shared session keys
-which can be used to exchange mutually authenticated messages with
-forward secrecy, as shown below.
+After exchanging public keys the parties calculate shared session
+keys.  The session keys can be used to exchange encrypted and
+authenticated messages with forward secrecy, as shown below.
 
 2.4. Minimal TripleDH
 -
@@ -218,12 +218,12 @@ published a signed ephemeral.
 3.4. Ephemeral reuse
 --
 
-At least one party must generate a unique ephemeral key for each
-protocol run.  Reuse of ephemeral keys by both parties is not allowed,
-and results in catastrophic security failure (reuse of session keys).
+Reuse of ephemeral keys is allowed if the reusing party sends
+encrypted messages using randomized encryption (e.g. a random IV).
+Otherwise, the reusing party might encrypt different messages with the
+same session key and IV, resulting in a catastrophic security failure.
 
-Reuse of ephemeral keys by a single party is allowed, but reduces
-security:
+Reusing ephemeral keys reduces security:
 
  * Encrypted messages can be replayed unless the party reusing its
    ephemeral takes other steps (such as maintaining a blacklist of
