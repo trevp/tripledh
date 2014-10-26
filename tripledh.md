@@ -151,12 +151,12 @@ In Minimal TripleDH an attacker might be able to tweak some of the
 transmitted (EC)DH values such that Alice and Bob still agree on
 secret session keys.  For example:
 
- * In (EC)DH systems with a cofactor and where public keys are not
-   validated for main subgroup membership it may be possible to encode
-   a public key as different byte sequences (e.g. [Curve25519][]).  An
-   attacker could change the encoding of identity public keys so that
-   Alice sees an encoding of Bob's public key that Bob might not
-   recognize.
+ * In (EC)DH systems with a cofactor, and where public keys are not
+   validated for main subgroup membership, it may be possible to
+   encode a public key as different byte sequences
+   (e.g. [Curve25519][]).  An attacker could change the encoding of
+   Bob's identity public key so that Alice sees an encoding that Bob
+   might not recognize.
 
  * An attacker could exponentiate Bob's (EC)DH keys by a constant when
    sending them to Alice, and do the same to Alice's keys when sending
