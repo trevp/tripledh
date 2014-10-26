@@ -136,13 +136,14 @@ This assumption is believed to hold for common (EC)DH algorithms.
 
 The signature algorithm should be secure when the same keypair is used
 for (EC)DH and signatures.  An example is a Schnorr signature such as
-[Curve25519-Signatures][] where all hash functions in the KDF and signature can be
-modelled as different random oracles.
+[Curve25519-Signatures][] where all hash functions in the KDF and
+signature can be modelled as different random oracles.
 
-The KDF should use a collision-resistant hash to "extract" a key from
-its inputs, then use a PRF to "expand" the key into session keys.  The
-recommended KDF is [HKDF][] using SHA256 or SHA512 with no salt, and
-the `info` variable containing a constant specific to the protocol.
+The KDF should use a collision-resistant cryptographic hash function
+to "extract" a key from its inputs, then use a PRF to "expand" the key
+into session keys.  The recommended KDF is [HKDF][] using SHA256 or
+SHA512 with a constant or absent salt, and the `info` variable containing
+a constant specific to the protocol.
 
 3.2. Identity binding
 --
@@ -172,9 +173,9 @@ identity data as "additional authenticated data" in encrypted
 messages.
 
 Identity data includes the identity public keys, and may also include
-certificates, names and addresses, protocol versions and offered
-features, and other information which both parties want to ensure they
-are seeing the same values for.
+certificates, names, protocol versions and offered features, and other
+information which both parties want to ensure they are seeing the same
+values for.
 
 3.3. Strong forward secrecy
 --
