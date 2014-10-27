@@ -3,7 +3,7 @@ Triple Diffie-Hellman
 =======================
 
  * **Author:** Trevor Perrin (curves @ trevp.net)
- * **Date:** 2014-10-25
+ * **Date:** 2014-10-27
  * **Revision:** 00 (work in progress)
  * **Copyright:** This document is placed in the public domain
 
@@ -11,10 +11,9 @@ Triple Diffie-Hellman
 =
 
 This document describes key agreement protocols that can be used with
-Diffie-Hellman or Elliptic Curve Diffie-Hellman key pairs.  These
+Diffie-Hellman over finite field or elliptic curve groups.  These
 protocols establish mutual authentication and forward secrecy via
-three DH or ECDH operations, thus are referred to as "TripleDH"
-protocols.
+three DH operations, thus are referred to as "TripleDH" protocols.
 
 A few TripleDH variants are presented, and their security properties
 are discussed.
@@ -31,15 +30,19 @@ are discussed.
     ||               Concatenation of byte sequences
     DH(X, Y)         The Diffie-Hellman or Elliptic Curve Diffie-
                      Hellman shared secret between public keys X and Y
-    KDF(Z)           A key derivation function suitable for converting
-                     DH() outputs into a session key
-    AE(K, D)         Authenticated encryption using symmetric key K of 
-                     data D
-    AEAD(K, D, AAD)  Authenticated encryption using symmetric key K of
-                     data D with "additional authenticated data" AAD
+    KDF(Z)           A key derivation function for converting DH()
+                     outputs into a session key
+    AE(K, D)         Authenticated encryption of data D using symmetric
+                     key K
+    AEAD(K, D, AAD)  Authenticated encryption of data D with additional
+                     authenticated data AAD using symmetric key K
     Signature(X, D)  Signature from public key X over data D
     A -> B: M        Party A sends message M to party B
     M*               Multiple instances of message M may be sent
+
+We use "DH" to mean the Diffie-Hellman algorithm over finite field or
+elliptic curve groups.  We use multiplicative group terminology, but
+everything here applies to elliptic curve groups as well.
 
 Protocol messages are numbered.  Messages with the same number can be
 sent simultaneously.  Messages with a later number shall only be sent
@@ -58,19 +61,17 @@ instance of any earlier-numbered messages.
     B"               Bob's extra ephemeral public key
     SKA              Alice's session key for sending messages
     SKB              Bob's session key for sending messages
-    <any>            Any byte sequence
+    <data>           Any byte sequence
     ID               Identity data for the session (e.g. identity
                      public keys, certificates, names, etc.)
 
 2.3. Setup
 -
 
-Two parties each have a long-term "identity" keypair, comprised of
-Diffie-Hellman or Elliptic Curve Diffie-Hellman values.  Both
-parties also have a short-term "ephemeral" keypair, also comprised of
-Diffie-Hellman or Elliptic Curve Diffie-Hellman values.
+Two parties each have a long-term "identity" DH key pair.  Both
+parties also have a short-term "ephemeral" key pair.
 
-All keypairs must use the same (EC)DH parameters, so that the `DH()`
+All key pairs must use the same DH group, so that the `DH()`
 function is defined between all public keys.
 
 In some TripleDH variants the Alice and Bob roles are symmetric, and
@@ -92,8 +93,8 @@ authenticated messages with forward secrecy, as shown below.
 
     SKA || SKB = KDF(DH(A, B') || DH(A', B) || DH(A', B'))
 
-    2. Alice -> Bob: AE(SKA, <any>)*
-    2. Alice <- Bob: AE(SKB, <any>)*
+    2. Alice -> Bob: AE(SKA, <data>)*
+    2. Alice <- Bob: AE(SKB, <data>)*
 
 2.5. Standard TripleDH
 -
@@ -102,10 +103,10 @@ authenticated messages with forward secrecy, as shown below.
     1.  Alice <- Bob: B, B'
 
     SKA || SKB = KDF(DH(A, B') || DH(A', B) || DH(A', B'))
-    ID = A || B || <any>
+    ID = A || B || <data>
 
-    2. Alice -> Bob: AEAD(SKA, <any>, ID)*
-    2. Alice <- Bob: AEAD(SKB, <any>, ID)*
+    2. Alice -> Bob: AEAD(SKA, <data>, ID)*
+    2. Alice <- Bob: AEAD(SKB, <data>, ID)*
 
 2.6. Standard TripleDH with signed ephemeral
 -
@@ -116,8 +117,8 @@ authenticated messages with forward secrecy, as shown below.
     SKA || SKB = KDF(DH(A, B') || DH(A', B) || DH(A', B'))
     ID = A || B || <any>
 
-    2. Alice -> Bob: AEAD(SKA, <any>, ID)*
-    3. Alice <- Bob: AEAD(SKB, <any>, ID)*
+    2. Alice -> Bob: AEAD(SKA, <data>, ID)*
+    3. Alice <- Bob: AEAD(SKB, <data>, ID)*
 
 2.7. Standard TripleDH with signed ephemeral and extra ephemeral
 -
@@ -128,8 +129,8 @@ authenticated messages with forward secrecy, as shown below.
     SKA || SKB = KDF(DH(A, B') || DH(A', B) || DH(A', B') || DH(A', B"))
     ID = A || B || <any>
 
-    2. Alice -> Bob: AEAD(SKA, <any>, ID)*
-    3. Alice <- Bob: AEAD(SKB, <any>, ID)*
+    2. Alice -> Bob: AEAD(SKA, <data>, ID)*
+    3. Alice <- Bob: AEAD(SKB, <data>, ID)*
 
 3. Security considerations
 =
@@ -137,11 +138,11 @@ authenticated messages with forward secrecy, as shown below.
 3.1. Instantiating cryptographic algorithms
 -
 
-The EC(DH) algorithm should be secure under the [Gap-DH][] assumption.
-This assumption is believed to hold for common (EC)DH algorithms.
+The DH group should be one where the [Gap-DH][] assumption holds.
+This assumption is believed to hold for common DH groups.
 
-The signature algorithm should be secure when the same keypair is used
-for (EC)DH and signatures.  An example is a Schnorr signature such as
+The signature algorithm should be secure when the same key pair is
+used for DH and signatures.  An example is a Schnorr signature such as
 [Curve25519-Signatures][] where all hash functions in the KDF and
 signature can be modelled as different random oracles.
 
@@ -155,17 +156,17 @@ a constant specific to the protocol.
 --
 
 In Minimal TripleDH an attacker might be able to tweak some of the
-transmitted (EC)DH values such that Alice and Bob still agree on
-secret session keys.  For example:
+transmitted DH values such that Alice and Bob still agree on secret
+session keys.  For example:
 
- * In (EC)DH systems with a cofactor, and where public keys are not
+ * In DH systems with a cofactor, and where public keys are not
    validated for main subgroup membership, it may be possible to
    encode a public key as different byte sequences
    (e.g. [Curve25519][]).  An attacker could change the encoding of
    Bob's identity public key so that Alice sees an encoding that Bob
    might not recognize.
 
- * An attacker could exponentiate Bob's (EC)DH keys by a constant when
+ * An attacker could exponentiate Bob's DH keys by a constant when
    sending them to Alice, and do the same to Alice's keys when sending
    them to Bob.  Alice and Bob will still calculate a shared session
    key, but won't see each other's correct identity public keys.  This
