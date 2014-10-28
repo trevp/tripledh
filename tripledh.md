@@ -44,10 +44,11 @@ We use "DH" to mean the Diffie-Hellman algorithm over finite field or
 elliptic curve groups.  We use multiplicative group terminology, but
 everything here applies to elliptic curve groups as well.
 
-Protocol messages are numbered.  Messages with the same number can be
-sent simultaneously.  Messages with a later number shall only be sent
-if the sending party has successfully sent or received at least one
-instance of any earlier-numbered messages.
+Protocol messages are shown with numbers.  Messages with the same
+number can be sent simultaneously or in any order.  Messages with a
+later number shall only be sent if the sending party has successfully
+sent or received at least one instance of any earlier-numbered
+messages.
 
 2.2. Variables
 -
@@ -283,6 +284,7 @@ Curve25519 public keys.
 Thanks to Matthew Green for discussion of deniability attacks and
 conditions.
 
+Thanks to Joseph Bonneau for detailed editorial feedback.
 
 5. References
 =
