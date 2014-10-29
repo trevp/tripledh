@@ -3,7 +3,7 @@ Triple Diffie-Hellman
 =======================
 
  * **Author:** Trevor Perrin (curves @ trevp.net)
- * **Date:** 2014-10-27
+ * **Date:** 2014-10-28
  * **Revision:** 00 (work in progress)
  * **Copyright:** This document is placed in the public domain
 
@@ -99,6 +99,11 @@ authenticated messages with forward secrecy, as shown below.
 2.5. Standard TripleDH
 -
 
+The minimal variant is susceptible to identity binding issues in some
+cases (see Section 3.2).  The recommended solution is to include
+identity data as "additional authenticated data" in the encrypted
+messages.
+
     1.  Alice -> Bob: A, A'
     1.  Alice <- Bob: B, B'
 
@@ -110,6 +115,11 @@ authenticated messages with forward secrecy, as shown below.
 
 2.6. Standard TripleDH with signed ephemeral
 -
+
+The standard variant is susceptible to weak forward secrecy issues in
+some cases (see Section 3.3).  If Alice is sending the first encrypted
+message, this can be addressed by having Bob publish a signature over
+his ephemeral public key.
 
     1.  Alice -> Bob: A, A'
     1.  Alice <- Bob: B, B', Signature(B, B')
@@ -123,6 +133,11 @@ authenticated messages with forward secrecy, as shown below.
 2.7. Standard TripleDH with signed ephemeral and extra ephemeral
 -
 
+The signed ephemeral variant is susceptible to key reuse issues if the
+signed ephemeral is reused over a long timeframe (see Section 3.4).
+One way to mitigate this is to add a shorter-lived "extra ephemeral"
+public key.
+
     1.  Alice -> Bob: A, A'
     1.  Alice <- Bob: B, B', Signature(B, B'), B"
 
@@ -135,7 +150,7 @@ authenticated messages with forward secrecy, as shown below.
 3. Security considerations
 =
 
-3.1. Instantiating cryptographic algorithms
+3.1. Choosing cryptographic algorithms
 -
 
 The DH group should be one where the [Gap-DH][] assumption holds.
@@ -237,16 +252,20 @@ Reusing ephemeral keys reduces security:
    ephemeral private key allows impersonating other parties to the
    compromised party.
 
-In an asynchronous setting many parties might send messages to Bob by
-reusing a signed ephemeral he published.
+In an asynchronous setting many parties might send messages to Bob
+before he's able to publish new signed ephemeral(s).
 
 To improve security in this case Bob might send a list of one-time-use
-"extra ephemeral" keys to some intermediary which hands them out to
-anyone who wants to send Bob a message.  Until these keys run out,
-messsages to Bob can use the "signed ephemeral and extra ephemeral"
-variant of TripleDH.  Messages sent using such extra ephemerals cannot
-be replayed and have improved forward secrecy, assuming Bob deletes
-the extra ephemeral private key on receiving the message.
+ephemeral keys to some intermediary which hands them out to anyone who
+wants to send Bob a message.  Until these keys run out, messsages to
+Bob cannot be replayed and have good forward secrecy, assuming Bob
+deletes the one-time ephemeral private key on receiving the message.
+
+To reduce storage costs for the intermediary, the "signed ephemeral
+and extra ephemeral" variant of TripleDH can be used, so that the
+intermediary only needs to store a single signed ephemeral public key,
+and can store a larger number of extra ephemeral public keys without
+signatures.
 
 3.5. Deniability
 -
@@ -295,20 +314,20 @@ party signs values from the other.  This adds robustness against
 ephemeral key compromise, but also adds message ordering constraints
 and weakens deniability.
 
-The "[NAXOS][] trick" can be used in many key agreement protocols to
-protect against RNG failure.  Ephemeral private keys are generated
+A technique from [NAXOS][] can be used in many key agreement protocols
+to protect against RNG failure.  Ephemeral private keys are generated
 using a KDF to combine some RNG output with a secret key that was
-generated at the same time as the identity private key (or - with
-great care - the identity private key itself can be used).  Assuming
-the RNG was secure when the initial data was generated, later
-ephemeral private keys will be secret even if the RNG becomes
-predictable (though ephemerals may be reused if the RNG repeats).
+generated at the same time as the identity private key (with great
+care the identity private key itself can be used).  Assuming the RNG
+was secure when the initial data was generated, later ephemeral
+private keys will be secret even if the RNG becomes predictable
+(though ephemerals may be reused if the RNG repeats).
 
-More robustness against ephemeral-key compromise could be achieved by
-a "QuadrupleDH" which adds `DH(A, B)` into the KDF.  With this,
-compromising a single ephemeral private key does not enable
-impersonation attacks, and compromising both ephemeral private keys
-for a session does not enable decrypting it.
+More robustness against ephemeral-key compromise can also be achieved
+at the cost of extra computation by a "QuadrupleDH" which adds `DH(A,
+B)` into the KDF.  With this, compromising a single ephemeral private
+key does not enable impersonation attacks, and compromising both
+ephemeral private keys for a session does not decrypt it.
 
 [HMQV][] and variants provide robustness similar to QuadrupleDH, and
 have greater computational efficiency than TripleDH, but have IPR
