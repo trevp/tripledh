@@ -299,10 +299,10 @@ The "[NAXOS][] trick" can be used in many key agreement protocols to
 protect against RNG failure.  Ephemeral private keys are generated
 using a KDF to combine some RNG output with a secret key that was
 generated at the same time as the identity private key (or - with
-great care - the identity key itself can be used).  Assuming the RNG
-was secure when the initial data was generated, later ephemeral
-private keys will be secret even if the RNG becomes predictable
-(though ephemerals may be reused if the RNG repeats).
+great care - the identity private key itself can be used).  Assuming
+the RNG was secure when the initial data was generated, later
+ephemeral private keys will be secret even if the RNG becomes
+predictable (though ephemerals may be reused if the RNG repeats).
 
 More robustness against ephemeral-key compromise could be achieved by
 a "QuadrupleDH" which adds `DH(A, B)` into the KDF.  With this,
@@ -310,8 +310,9 @@ compromising a single ephemeral private key does not enable
 impersonation attacks, and compromising both ephemeral private keys
 for a session does not enable decrypting it.
 
-[HMQV][] and variants provide similar robustness, and more
-computational efficiency, but have IPR concerns.
+[HMQV][] and variants provide robustness similar to QuadrupleDH, and
+have greater computational efficiency than TripleDH, but have IPR
+concerns.
 
 4. Acknowledgements
 =
