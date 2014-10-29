@@ -302,11 +302,11 @@ For example:
 
 Compared to this, TripleDH has smaller messages and doesn't require
 implementing signatures (in some variants).  TripleDH is also more
-robust if a single ephemeral key is compromised.  Such a compromise
-only allows impersonating parties to the victim while the victim uses
-that key.  But above, such a compromise also allows permanent
-impersonation *of* the victim, and passive decryption of all
-communications involving the compromised key.
+robust if a single ephemeral key is compromised.  By itself, the only
+attack such a compromise allows is impersonating parties to the victim
+while the victim uses that key.  But above, such a compromise also
+allows permanent impersonation *of* the victim, and passive decryption
+of all communications involving the compromised key.
 
 In more complex signature-based key agreements, like [SIGMA][], each
 party signs values from the other.  This adds robustness against
