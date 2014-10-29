@@ -262,10 +262,9 @@ Bob cannot be replayed and have good forward secrecy, assuming Bob
 deletes the one-time ephemeral private key on receiving the message.
 
 To reduce storage costs for the intermediary, the "signed ephemeral
-and extra ephemeral" variant of TripleDH can be used, so that the
-intermediary only needs to store a single signed ephemeral public key,
-and can store a larger number of extra ephemeral public keys without
-signatures.
+and extra ephemeral" variant of TripleDH can be used.  This enables
+the intermediary to only store a single signed ephemeral public key,
+and a larger number of unsigned extra ephemeral public keys.
 
 3.5. Deniability
 -
