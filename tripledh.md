@@ -70,10 +70,9 @@ messages.
 -
 
 Two parties each have a long-term "identity" DH key pair.  Both
-parties also have a short-term "ephemeral" key pair.
-
-All key pairs must use the same DH group, so that the `DH()`
-function is defined between all public keys.
+parties also have a short-term "ephemeral" key pair.  All key pairs
+must use the same DH group, so that the `DH()` function is defined
+between all public keys.
 
 In some TripleDH variants the Alice and Bob roles are symmetric, and
 the parties assign themselves roles based on any signal available
@@ -178,7 +177,7 @@ session keys.  For example:
 Some protocols avoid these issues by hashing identity data into the
 session key (e.g. [KEA+][]).  Standard TripleDH instead includes the
 identity data as "additional authenticated data" in encrypted
-messages.
+messages, due to IPR concerns.
 
 Identity data includes the identity public keys, and may also include
 certificates, names, protocol versions and offered features, and other
@@ -268,6 +267,52 @@ provided the following conditions are met:
    to third parties who can confirm the relationship if they
    compromise the victim's identity and ephemeral private keys.)
 
+3.6. Alternatives
+-
+
+One alternative to TripleDH is to use signatures for authentication.
+For example:
+
+    1.  Alice -> Bob: A, A', Signature(A, A')
+    1.  Alice <- Bob: B, B', Signature(B, B')
+
+    ID = A || B || <data>
+    SKA || SKB = KDF(DH(A', B') || ID)
+
+    2. Alice -> Bob: AE(SKA, <data>)*
+    2. Alice <- Bob: AE(SKB, <data>)*
+
+Compared to this, TripleDH has smaller messages and doesn't require
+implementing signatures (in some variants).  TripleDH is also more
+robust if a single ephemeral key is compromised.  Such a compromise
+only allows impersonating parties to the victim while the victim uses
+that key.  But above, such a compromise also allows permanent
+impersonation *of* the victim, and passive decryption of all
+communications involving the compromised key.
+
+In more complex signature-based key agreements, like [SIGMA][], each
+party signs values from the other.  This adds robustness against
+ephemeral key compromise, but also adds message ordering constraints
+and weakens deniability.
+
+The "[NAXOS][] trick" can be used in many key agreement protocols to
+protect against RNG failure.  Ephemeral private keys are generated
+using a KDF to combine some RNG output with a secret key that was
+generated at the same time as the identity private key (or - with
+great care - the identity key itself can be used).  Assuming the RNG
+was secure when the initial data was generated, later ephemeral
+private keys will be secret even if the RNG becomes predictable
+(though ephemerals may be reused if the RNG repeats).
+
+More robustness against ephemeral-key compromise could be achieved by
+a "QuadrupleDH" which adds `DH(A, B)` into the KDF.  With this,
+compromising a single ephemeral private key does not enable
+impersonation attacks, and compromising both ephemeral private keys
+for a session does not enable decrypting it.
+
+[HMQV][] and variants provide similar robustness, and more
+computational efficiency, but have IPR concerns.
+
 4. Acknowledgements
 =
 
@@ -312,6 +357,10 @@ https://github.com/trevp/curve25519sigs/blob/master/curve25519sigs.md
 [HMQV]: #HMQV
 <a name="HMQV">**HMQV:**</a>
 <http://eprint.iacr.org/2005/176.pdf>
+
+[SIGMA]: #SIGMA
+<a name="SIGMA">**SIGMA:**</a>
+<http://www.iacr.org/cryptodb/archive/2003/CRYPTO/1495/1495.pdf>
 
 [Kudla-Paterson]: #Kudla-Paterson
 <a name="Kudla-Paterson">**Kudla-Paterson:**</a>
