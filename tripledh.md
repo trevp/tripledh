@@ -34,8 +34,8 @@ are discussed.
                      outputs into a session key
     AE(K, D)         Authenticated encryption of data D using symmetric
                      key K
-    AEAD(K, D, AAD)  Authenticated encryption of data D with additional
-                     authenticated data AAD using symmetric key K
+    AEAD(K, D, AD)   Authenticated encryption of data D with associated
+                     data AD using symmetric key K
     Signature(X, D)  Signature from public key X over data D
     A -> B: M        Party A sends message M to party B
     M*               Multiple instances of message M may be sent
@@ -156,16 +156,21 @@ public key.
 The DH group should be one where the [Gap-DH][] assumption holds.
 This assumption is believed to hold for common DH groups.
 
-The signature algorithm should be secure when the same key pair is
-used for DH and signatures.  An example is a Schnorr signature such as
-[Curve25519-Signatures][] where all hash functions in the KDF and
-signature can be modelled as different random oracles.
-
 The KDF should use a collision-resistant cryptographic hash function
 to "extract" a key from its inputs, then use a PRF to "expand" the key
 into session keys.  The recommended KDF is [HKDF][] using SHA256 or
 SHA512 with a constant or absent salt, and the `info` variable containing
 a constant specific to the protocol.
+
+The [AE][] and [AEAD][] algorithms may be randomized or stateful.  Stateful
+algorithms must be used carefully to avoid catastrophic failure due to
+key reuse (see Section 3.4). 
+
+The signature algorithm should be [EUF-CMA][] secure when the same key
+pair is used for DH and signatures.  An example is a Schnorr signature
+such as [Curve25519-Signatures][] where all hash functions in the KDF
+and signature can be modelled as different random oracles.
+
 
 3.2. Identity binding
 --
@@ -364,6 +369,18 @@ https://github.com/trevp/curve25519sigs/blob/master/curve25519sigs.md
 [HKDF]: #HKDF
 <a name="HKDF">**HKDF:**</a>
 <http://tools.ietf.org/html/rfc5869>
+
+[AE]: #AE
+<a name="AE">**AE:**</a>
+<https://cseweb.ucsd.edu/~mihir/papers/oem.pdf>
+
+[AEAD]: #AEAD
+<a name="AEAD">**AEAD:**</a>
+<http://web.cs.ucdavis.edu/~rogaway/papers/ad.html>
+
+[EUF-CMA]: #EUF-CMA
+<a name="EUF-CMA">**EUF-CMA:**</a>
+<https://eprint.iacr.org/2011/615.pdf>
 
 [Curve25519]: #Curve25519
 <a name="Curve25519">**Curve25519:**</a>
