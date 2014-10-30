@@ -3,7 +3,7 @@ Triple Diffie-Hellman
 =======================
 
  * **Author:** Trevor Perrin (curves @ trevp.net)
- * **Date:** 2014-10-28
+ * **Date:** 2014-10-29
  * **Revision:** 00 (work in progress)
  * **Copyright:** This document is placed in the public domain
 
