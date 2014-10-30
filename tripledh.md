@@ -43,7 +43,7 @@ are discussed.
 
 We use "DH" to mean the Diffie-Hellman algorithm over finite field or
 elliptic curve groups.  We use multiplicative group terminology, but
-everything here applies to elliptic curve groups as well.
+everything here applies to elliptic curves as well.
 
 Protocol messages are shown with numbers.  Messages with the same
 number can be sent simultaneously or in any order.  Messages with a
@@ -158,9 +158,9 @@ This assumption is believed to hold for common DH groups.
 
 The KDF should use a collision-resistant cryptographic hash function
 to "extract" a key from its inputs, then use a PRF to "expand" the key
-into session keys.  The recommended KDF is [HKDF][] using SHA256 or
-SHA512 with a constant or absent salt, and the `info` variable containing
-a constant specific to the protocol.
+into session keys.  The recommended KDF is [HKDF][] using SHA2-256 or
+SHA2-512 with a constant or absent salt, and the `info` variable
+containing a constant specific to the protocol.
 
 The [AE][] and [AEAD][] algorithms may be randomized or stateful.  Stateful
 algorithms must be used carefully to avoid catastrophic failure due to
@@ -263,8 +263,8 @@ before he's able to publish new signed ephemeral(s).
 To improve security in this case Bob might send a list of one-time-use
 ephemeral keys to some intermediary which hands them out to anyone who
 wants to send Bob a message.  Until these keys run out, messsages to
-have good forward secrecy and cannot be replayed, assuming Bob deletes
-the one-time ephemeral private key on receiving the message.
+Bob have good forward secrecy and cannot be replayed, assuming Bob
+deletes the one-time ephemeral private key on receiving the message.
 
 To reduce storage costs for the intermediary, the "signed ephemeral
 and extra ephemeral" variant of TripleDH can be used.  This enables
