@@ -35,7 +35,8 @@ are discussed.
     AE(K, D)         Authenticated encryption of data D using symmetric
                      key K
     AEAD(K, D, AD)   Authenticated encryption of data D with associated
-                     data AD using symmetric key K
+                     data AD using symmetric key K; AD is authenticated
+                     but not included in the output
     Signature(X, D)  Signature from public key X over data D
     A -> B: M        Party A sends message M to party B
     M*               Multiple instances of message M may be sent
@@ -101,8 +102,7 @@ authenticated messages with forward secrecy, as shown below.
 
 The minimal variant is susceptible to identity binding issues in some
 cases (see Section 3.2).  The recommended solution is to include
-identity data as "additional authenticated data" in the encrypted
-messages.
+identity data as "associated data" in the encrypted messages.
 
     1.  Alice -> Bob: A, A'
     1.  Alice <- Bob: B, B'
@@ -195,9 +195,9 @@ session keys.  For example:
    "man-in-the-middle".
 
 Some protocols avoid these issues by hashing identity data into the
-session key (e.g. [KEA+][]).  Standard TripleDH instead includes the
-identity data as "additional authenticated data" in encrypted
-messages, due to IPR concerns.
+session key (e.g. [KEA+][]).  Standard TripleDH instead uses the
+identity data as "associated data" in encrypted messages, due to IPR
+concerns.
 
 Identity data includes the identity public keys, and may also include
 certificates, names, protocol versions and offered features, and other
@@ -263,13 +263,13 @@ before he's able to publish new signed ephemeral(s).
 To improve security in this case Bob might send a list of one-time-use
 ephemeral keys to some intermediary which hands them out to anyone who
 wants to send Bob a message.  Until these keys run out, messsages to
-Bob cannot be replayed and have good forward secrecy, assuming Bob
-deletes the one-time ephemeral private key on receiving the message.
+have good forward secrecy and cannot be replayed, assuming Bob deletes
+the one-time ephemeral private key on receiving the message.
 
 To reduce storage costs for the intermediary, the "signed ephemeral
 and extra ephemeral" variant of TripleDH can be used.  This enables
-the intermediary to only store a single signed ephemeral public key,
-and a larger number of unsigned extra ephemeral public keys.
+the intermediary to store a larger number of unsigned extra ephemeral
+public keys.
 
 3.5. Deniability
 -
